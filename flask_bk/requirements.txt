@@ -1,0 +1,8 @@
+Flask==2.2.3
+Flask_Cors==3.0.10
+minio
+mysql-connector-python==8.0.33
+numpy==1.23.5
+Pillow==9.5.0
+PyJWT==2.6.0
+requests
