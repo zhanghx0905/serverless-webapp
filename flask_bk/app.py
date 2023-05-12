@@ -13,9 +13,9 @@ from img_service import get_labels
 APP = Flask(__name__)
 CORS(APP)
 
-
+MINIO_HOST = os.environ["MINIO_HOST"]
 MINIO_CLIENT = Minio(
-    "127.0.0.1:9000", access_key="root", secret_key="12345678", secure=False
+    f"{MINIO_HOST}:9000", access_key="root", secret_key="12345678", secure=False
 )
 
 BUCKET_NAME = "task-attachment"

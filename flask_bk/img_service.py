@@ -1,12 +1,13 @@
-import io
 import json
+import os
 
-from PIL import Image
 import numpy as np
 import requests
+from PIL import Image
 
+TF_HOST = os.environ["TF_SERVER_HOST"]
 TF_SERVICE = (
-    "http://localhost:8501/v1/models/efficientnet_v2_imagenet21k_ft1k_s:predict"
+    f"http://{TF_HOST}:8501/v1/models/efficientnet_v2_imagenet21k_ft1k_s:predict"
 )
 IMAGENET_CLASSES = "imagenet_class_index.json"
 
@@ -18,16 +19,12 @@ def load_imagenet_labels():
 
 
 class LabelsGetter:
-    def __init__(self) -> None:
-        self.label_dict = load_imagenet_labels()
+    label_dict = load_imagenet_labels()
 
     def __call__(self, predictions, topk=5):
         values = list(enumerate(predictions))
         indices = sorted(values, key=lambda x: x[1], reverse=True)[:topk]
         return [self.label_dict[i] for i, _ in indices]
-
-
-LABEL_GETTER = LabelsGetter()
 
 
 def get_labels(img_data):
@@ -38,7 +35,8 @@ def get_labels(img_data):
 
     response = requests.post(TF_SERVICE, json.dumps({"instances": image}), timeout=2)
     predictions = response.json()["predictions"][0]
-    return " ".join(LABEL_GETTER(predictions, 10))
+    local_getter = LabelsGetter()
+    return " ".join(local_getter(predictions, 10))
 
 
 if __name__ == "__main__":

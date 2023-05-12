@@ -1,11 +1,13 @@
+import os
 from functools import wraps
 
 import jwt
 import mysql.connector
 from flask import Request, request
 
+MYSQL_HOST = os.environ["MYSQL_HOST"]
 CONN = mysql.connector.connect(
-    user="root", password="123456", host="localhost", port=3306, database="aws_test"
+    user="root", password="123456", host=MYSQL_HOST, port=3306, database="aws_test"
 )
 CURSOR = CONN.cursor()
 
