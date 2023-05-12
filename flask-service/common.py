@@ -4,13 +4,21 @@ from functools import wraps
 import jwt
 import mysql.connector
 from flask import Request, request
+from minio import Minio
 
 MYSQL_HOST = os.environ["MYSQL_HOST"]
 CONN = mysql.connector.connect(
     user="root", password="123456", host=MYSQL_HOST, port=3306, database="aws_test"
 )
 CURSOR = CONN.cursor()
+MINIO_HOST = os.environ["MINIO_HOST"]
+MINIO_CLIENT = Minio(
+    f"{MINIO_HOST}:9000", access_key="root", secret_key="12345678", secure=False
+)
 
+BUCKET_NAME = "task-attachment"
+if not MINIO_CLIENT.bucket_exists(BUCKET_NAME):
+    MINIO_CLIENT.make_bucket(BUCKET_NAME)
 SECRET_KEY = "cloud-computing-secret"
 
 
@@ -31,7 +39,7 @@ def user_verified(request: Request) -> str:
     user_token = CURSOR.fetchone()
     if user_token[0] != token:
         return "Token incorrect"
-    setattr(request, "username", username) 
+    setattr(request, "username", username)
     return "OK"
 
 

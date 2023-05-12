@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 import jwt
 from flask import Flask, request
 from flask_cors import CORS
-from minio import Minio
 from minio.deleteobjects import DeleteObject
 
 from common import *
@@ -12,15 +11,6 @@ from img_service import get_labels
 
 APP = Flask(__name__)
 CORS(APP)
-
-MINIO_HOST = os.environ["MINIO_HOST"]
-MINIO_CLIENT = Minio(
-    f"{MINIO_HOST}:9000", access_key="root", secret_key="12345678", secure=False
-)
-
-BUCKET_NAME = "task-attachment"
-if not MINIO_CLIENT.bucket_exists(BUCKET_NAME):
-    MINIO_CLIENT.make_bucket(BUCKET_NAME)
 
 
 @APP.route("/token", methods=["POST"])
@@ -104,4 +94,4 @@ def predict_image(task_id):
 
 
 if __name__ == "__main__":
-    ...
+    APP.run("0.0.0.0")

@@ -1,0 +1,13 @@
+version: 1.0
+provider:
+  name: openfaas
+  gateway: http://127.0.0.1:8080
+functions:
+  flask-service:
+    lang: dockerfile
+    handler: ./flask-service
+    image: zhanghx0905/backend-service
+    environment:
+      MINIO_HOST: minio-service.default.svc.cluster.local
+      MYSQL_HOST: mysql-service.default.svc.cluster.local
+      TF_HOST: tensorflow-serving-service.default.svc.cluster.local
