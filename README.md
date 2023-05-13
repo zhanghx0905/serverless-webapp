@@ -1,16 +1,12 @@
 # Serverless Todo List
 
-Derived from [aws-samples/serverless-tasks-webapp: Getting Started with Serverless Workshop — Tasks web application (github.com)](https://github.com/aws-samples/serverless-tasks-webapp).
+Derived from [aws-samples/serverless-tasks-webapp: Getting Started with Serverless Workshop — Tasks web application (github.com)](https://github.com/aws-samples/serverless-tasks-webapp). This project implements a simple to-do list web application that enables the addition and deletion of tasks, image upload functionality, and the generation of labels for images. 
+
+I replaced services originally provided by AWS with their open-source equivalents. As such, **AWS Lambda has been replaced by OpenFaaS, S3 has been substituted by MinIO, Rekognition has been supplanted by TensorFlow, and DynamoDB has been replaced with MySQL**. This approach not only preserves the core functionalities but also leverages the flexibility and control offered by open-source alternatives.
 
 ## Architecture
 
-```
-NodeJS (Vue) ==> OpenFaaS (Python-Flask) ==> MySQL
-				||				||
-				||				||
-				\/				\/
-				MinIO		TF Serving
-```
+![](./doc/arch.drawio.svg)
 
 | Module       | Public Port    | Local Path     |
 | ------------ | -------------- | -------------- |
