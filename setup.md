@@ -35,9 +35,11 @@ sudo -i
 Start containers in sequence,
 
 ```bash
-minikube start --kubernetes-version=v1.22.0 HTTP_PROXY=https://minikube.sigs.k8s.io/docs/reference/networking/proxy/ --extra-config=apiserver.service-node-port-range=6000-32767 disk=20000MB --vm=true --driver=none
 
 # frontend container
+PUBLIC_IP=$(curl https://ifconfig.me/)
+sed -i 's#http://localhost:5000#http://'"$PUBLIC_IP"':31112/function/flask-service#g' webapp/src/gloopts.js
+
 docker build -t todo-frontend ./webapp
 
 # TF model
@@ -47,8 +49,12 @@ mkdir -p ./model
 tar -xzf efficientnet_v2_imagenet21k_ft1k_s.tar.gz -C ./model
 rm efficientnet_v2_imagenet21k_ft1k_s.tar.gz
 
+# Start minikube
+minikube start --kubernetes-version=v1.22.0 HTTP_PROXY=https://minikube.sigs.k8s.io/docs/reference/networking/proxy/ --extra-config=apiserver.service-node-port-range=6000-32767 disk=20000MB --vm=true --driver=none
+
 # deploy mysql, minio, tf serving and frontend
-cat deployment.yaml | sed s+{{path}}+$(pwd)+g | kubectl apply -f -
+cat services.yml | sed s+{{path}}+$(pwd)+g | kubectl apply -f -
+kubectl rollout status deploy/frontend-deployment
 kubectl port-forward svc/frontend-service 80:8080 --address=0.0.0.0 &
 
 # install openfaas
@@ -58,13 +64,18 @@ arkade install openfaas
 kubectl rollout status -n openfaas deploy/gateway
 kubectl port-forward -n openfaas svc/gateway 8080:8080 &
 
+echo "> Waiting until Openfaas to launch on 8080"
+while ! nc -z localhost 8080; do
+	sleep 1
+done
+
 # If basic auth is enabled, you can now log into your gateway:
 PASSWORD=$(kubectl get secret -n openfaas basic-auth -o jsonpath="{.data.basic-auth-password}" | base64 --decode; echo)
 echo -n $PASSWORD | faas-cli login --username admin --password-stdin
 
 # deploy openfaas
-faas-cli up -f faas-service.yml
-kubectl apply -f faas-ingress.yaml
+faas-cli build -f faas-service.yml
+faas-cli deploy -f faas-service.yml
 ```
 
 You should now be able to access the OpenFaas administration interface by accessing `public IP: 31112`. Note that the firewall rule for EC2 is set to allow all traffic.

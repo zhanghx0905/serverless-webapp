@@ -5,7 +5,7 @@ import numpy as np
 import requests
 from PIL import Image
 
-TF_HOST = os.environ["TF_SERVER_HOST"]
+TF_HOST = os.environ["TF_HOST"]
 TF_SERVICE = (
     f"http://{TF_HOST}:8501/v1/models/efficientnet_v2_imagenet21k_ft1k_s:predict"
 )
@@ -37,7 +37,7 @@ def get_labels(img_data):
     image = image.convert("RGB")
     image = np.expand_dims(np.array(image) / 255.0, 0).tolist()
 
-    response = requests.post(TF_SERVICE, json.dumps({"instances": image}), timeout=2)
+    response = requests.post(TF_SERVICE, json.dumps({"instances": image}), timeout=5)
     predictions = response.json()["predictions"][0]
     return " ".join(LABEL_GETTER(predictions, 10))
 
