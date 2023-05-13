@@ -1,3 +1,4 @@
+import io
 import json
 import os
 
@@ -19,19 +20,15 @@ def load_imagenet_labels():
 
 
 class LabelsGetter:
-    def __init__(self) -> None:
-        self.label_dict = load_imagenet_labels()
+    _label_dict = load_imagenet_labels()
 
     def __call__(self, predictions, topk=5):
         values = list(enumerate(predictions))
         indices = sorted(values, key=lambda x: x[1], reverse=True)[:topk]
-        return [self.label_dict[i] for i, _ in indices]
+        return [self._label_dict[i] for i, _ in indices]
 
 
-LABEL_GETTER = LabelsGetter()
-
-
-def get_labels(img_data):
+def get_labels(image: io.BytesIO):
     image = Image.open(img_data)
     image = image.resize((384, 384))
     image = image.convert("RGB")
@@ -39,8 +36,12 @@ def get_labels(img_data):
 
     response = requests.post(TF_SERVICE, json.dumps({"instances": image}), timeout=5)
     predictions = response.json()["predictions"][0]
-    return " ".join(LABEL_GETTER(predictions, 10))
+    local_getter = LabelsGetter()
+    return " ".join(local_getter(predictions, 10))
 
 
 if __name__ == "__main__":
-    ...
+    with open("cat.jpg", "rb") as f:
+        img = f.read()
+    img = io.BytesIO(img)
+    print(get_labels(img))
