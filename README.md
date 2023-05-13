@@ -1,8 +1,8 @@
 # Serverless Todo List
 
-Derived from [aws-samples/serverless-tasks-webapp: Getting Started with Serverless Workshop — Tasks web application (github.com)](https://github.com/aws-samples/serverless-tasks-webapp). This project implements a simple to-do list web application that enables the addition and deletion of tasks, image upload functionality, and the generation of labels for images. 
+Derived from [aws-samples/serverless-tasks-webapp: Getting Started with Serverless Workshop — Tasks web application (github.com)](https://github.com/aws-samples/serverless-tasks-webapp). This project implements a simple to-do list web application that enables user login, task addition and deletion, image uploading, and image recognition. 
 
-I replaced services originally provided by AWS with their open-source equivalents. As such, **AWS Lambda has been replaced by OpenFaaS, S3 has been substituted by MinIO, Rekognition has been supplanted by TensorFlow, and DynamoDB has been replaced with MySQL**. This approach not only preserves the core functionalities but also leverages the flexibility and control offered by open-source alternatives.
+I replaced services originally provided by AWS with their open-source equivalents. As such, **AWS Lambda has been replaced by OpenFaaS, S3 by MinIO, Rekognition by TensorFlow, and DynamoDB by MySQL**. We not only preserve the core functionalities but also leverage the flexibility and control offered by open-source alternatives.
 
 ## Architecture
 
