@@ -1,5 +1,7 @@
 # Serverless Todo List
 
+[Technical Report](./doc/report.pdf)
+
 Derived from [aws-samples/serverless-tasks-webapp: Getting Started with Serverless Workshop — Tasks web application (github.com)](https://github.com/aws-samples/serverless-tasks-webapp). This project implements a simple to-do list web application that enables user login, task addition and deletion, image uploading, and image recognition. 
 
 I replaced services originally provided by AWS with their open-source equivalents. As such, **AWS Lambda has been replaced by OpenFaaS, S3 by MinIO, Rekognition by TensorFlow, and DynamoDB by MySQL**. We not only preserve the core functionalities but also leverage the flexibility and control offered by open-source alternatives.
@@ -11,14 +13,14 @@ I replaced services originally provided by AWS with their open-source equivalent
 | Module       | Public Port    | Local Path     |
 | ------------ | -------------- | -------------- |
 | NodeJS (vue) | 80             | ClusterIP:8080 |
-| OpenFaaS     | 31112          | localhost:8080 |
-| MinIO        | 9090 (Console) | ClusterIP:9000 |
+| OpenFaaS     | 31112 (Management UI)         | localhost:8080 |
+| MinIO        | 9090 (Management UI) | ClusterIP:9000 |
 | MySQL        | ×              | ClusterIP:3306 |
 | TF Serving   | ×              | ClusterIP:8501 |
 
 ## Building
 
-The following is an example of Ubuntu 22.04 EC2.
+The following is an example of Ubuntu 22.04 EC2. Note that the firewall rule for EC2 is set to allow all traffic.
 
 Install the dependencies, they are all necessary components,
 
@@ -87,6 +89,7 @@ while ! nc -z localhost 8080; do
 done
 
 # If basic auth is enabled, you can now log into your gateway:
+# The default username is `admin` and the password is obtained via `echo $PASSWORD`.
 PASSWORD=$(kubectl get secret -n openfaas basic-auth -o jsonpath="{.data.basic-auth-password}" | base64 --decode; echo)
 echo -n $PASSWORD | faas-cli login --username admin --password-stdin
 
@@ -94,9 +97,3 @@ echo -n $PASSWORD | faas-cli login --username admin --password-stdin
 faas-cli build -f faas-service.yml
 faas-cli deploy -f faas-service.yml
 ```
-
-### OpenFaaS
-
-You should now be able to access the OpenFaaS administration interface by accessing `public IP: 31112`. Note that the firewall rule for EC2 is set to allow all traffic.
-
-The default username is `admin` and the password is obtained via `echo $PASSWORD`.
